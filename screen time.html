@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time Limit - Podcast (Demo)</title>
+  <style>
+    :root {
+      --bg-dark: #1c1c1e;
+      --accent-blue: #0A84FF;
+      --accent-green: #30D158;
+      --accent-red: #FF453A;
+      --text-main: #FFFFFF;
+      --text-sub: rgba(235, 235, 245, 0.6);
+      --btn-outline-bg: rgba(255, 255, 255, 0.08);
+      --border-light: rgba(255, 255, 255, 0.2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--bg-dark);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-main);
+      overflow: hidden;
+    }
+
+    /* Banner Avviso Demo */
+    .demo-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: var(--accent-red);
+      color: #FFFFFF;
+      text-align: center;
+      padding: 10px 16px;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    /* Struttura principale */
+    .device {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Gestione Schermate */
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+      padding-top: 60px;
+    }
+
+    .screen.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0 32px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    /* Icona Clessidra */
+    .icon {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 24px;
+    }
+
+    /* Tipografia */
+    h1 {
+      color: var(--text-main);
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.4px;
+    }
+
+    p.desc {
+      color: var(--text-sub);
+      font-size: 16px;
+      line-height: 1.35;
+      max-width: 300px;
+    }
+
+    /* Bottoni */
+    .btn-wrap {
+      width: 100%;
+      max-width: 400px;
+      padding: 0 20px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      user-select: none;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 16px 0;
+      border-radius: 25px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      transition: background 0.15s ease, transform 0.1s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-accent {
+      background: var(--accent-blue);
+      color: var(--text-main);
+    }
+
+    .btn-outline {
+      background: var(--btn-outline-bg);
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+    }
+
+    .back-link {
+      position: absolute;
+      top: 65px;
+      left: 20px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--accent-blue);
+      font-size: 17px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+      padding: 8px;
+    }
+
+    /* PIN Dots */
+    .pin-container {
+      position: relative;
+      margin-top: 32px;
+      cursor: pointer;
+    }
+
+    .dots {
+      display: flex;
+      gap: 24px;
+    }
+
+    .dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1.5px solid var(--text-sub);
+      background: transparent;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .dot.filled {
+      background: var(--text-main);
+      border-color: var(--text-main);
+      transform: scale(1.1);
+    }
+
+    .hidden-input {
+      position: absolute;
+      inset: -10px;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* Registro PIN */
+    .log-list {
+      width: 100%;
+      max-height: 350px;
+      overflow-y: auto;
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .log-item {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 14px 18px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .log-pin {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent-blue);
+    }
+
+    .log-time {
+      color: var(--text-sub);
+      font-size: 13px;
+    }
+
+    .btn-danger {
+      background: transparent;
+      border: 1px solid var(--accent-red);
+      color: var(--accent-red);
+      padding: 10px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="device">
+
+    <!-- Screen 1: Time Limit -->
+    <section class="screen active" id="screen-main">
+      <div class="content">
+        <!-- SVG Icona Clessidra -->
+        <svg class="icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M25 20C25 13.5 30.5 8 37 8H63C69.5 8 75 13.5 75 20C75 30 63 41 53 49C51 50.5 51 51.5 53 53C63 61 75 72 75 82C75 88.5 69.5 94 63 94H37C30.5 94 25 88.5 25 82C25 72 37 61 47 53C49 51.5 49 50.5 47 49C37 41 25 30 25 20Z" fill="#0A84FF"/>
+          <path d="M36 80C36 73 43 65 50 59C57 65 64 73 64 80C64 83.3 61.3 86 58 86H42C38.7 86 36 83.3 36 80Z" fill="#1C1C1E"/>
+        </svg>
+        <h1>Limite di tempo</h1>
+        <p class="desc">Hai raggiunto il tempo consentito su podcast</p>
+      </div>
+      <div class="btn-wrap">
+        <button class="btn btn-accent" data-target="screen-main">OK</button>
+        <button class="btn btn-outline" data-target="screen-request">Richiedi più tempo</button>
+      </div>
+    </section>
+
+    <!-- Screen 2: Richiedi più tempo -->
+    <section class="screen" id="screen-request">
+      <button class="back-link" data-target="screen-main">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+        Indietro
+      </button>
+      <div class="content">
+        <svg class="icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M25 20C25 13.5 30.5 8 37 8H63C69.5 8 75 13.5 75 20C75 30 63 41 53 49C51 50.5 51 51.5 53 53C63 61 75 72 75 82C75 88.5 69.5 94 63 94H37C30.5 94 25 88.5 25 82C25 72 37 61 47 53C49 51.5 49 50.5 47 49C37 41 25 30 25 20Z" fill="#0A84FF"/>
+          <path d="M36 80C36 73 43 65 50 59C57 65 64 73 64 80C64 83.3 61.3 86 58 86H42C38.7 86 36 83.3 36 80Z" fill="#1C1C1E"/>
+        </svg>
+        <h1>Richiedi più tempo</h1>
+        <p class="desc">Scegli come sbloccare Podcast.</p>
+      </div>
+      <div class="btn-wrap">
+        <button class="btn btn-outline" data-target="screen-sent">Invia richiesta</button>
+        <button class="btn btn-outline" data-target="screen-pin" id="btn-to-pin">Inserisci codice il codice per "Tempo di utilizzo"</button>
+      </div>
+    </section>
+
+    <!-- Screen 3: Richiesta inviata -->
+    <section class="screen" id="screen-sent">
+      <div class="content">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <h1>Richiesta inviata</h1>
+        <p class="desc">La richiesta è stata inviata ed è in attesa di essere approvata da un genitore. La richiesta può inoltre essere accettata di persona da un adulto su questo dispositivo.</p>
+      </div>
+      <div class="btn-wrap">
+        <button class="btn btn-accent" data-target="screen-main">OK</button>
+      </div>
+    </section>
+
+    <!-- Screen 4: Inserisci codice -->
+    <section class="screen" id="screen-pin">
+      <button class="back-link" data-target="screen-request">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+        Indietro
+      </button>
+      <div class="content">
+        <h1>Inserisci il codice per "Tempo di utilizzo"</h1>
+        <div class="pin-container" onclick="document.getElementById('pin-input').focus()">
+          <div class="dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+          <input id="pin-input" class="hidden-input" type="text" maxlength="4" autocomplete="off" autofocus>
+        </div>
+      </div>
+    </section>
+
+    <!-- Screen 5: Codice corretto -->
+    <section class="screen" id="screen-correct">
+      <div class="content">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <h1>Codice corretto</h1>
+      </div>
+      <div class="btn-wrap">
+        <button class="btn btn-accent" data-target="screen-main">OK</button>
+      </div>
+    </section>
+
+    <!-- Screen Admin: Registro PIN -->
+    <section class="screen" id="screen-logs">
+      <button class="back-link" data-target="screen-main">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+        Indietro
+      </button>
+      <div class="content" style="justify-content: flex-start; padding-top: 40px;">
+        <h1>PIN Salvati</h1>
+        <p class="desc" style="font-size: 13px;">Storico delle cifre inserite</p>
+        
+        <div class="log-list" id="log-container"></div>
+
+        <button class="btn-danger" id="btn-clear-logs">Svuota Registro</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const pinInput = document.getElementById('pin-input');
+      const dots = document.querySelectorAll('.dot');
+      const logContainer = document.getElementById('log-container');
+
+      document.querySelectorAll('[data-target]').forEach(button => {
+        button.addEventListener('click', () => {
+          const targetId = button.getAttribute('data-target');
+          if (button.id === 'btn-to-pin') resetPin();
+          showScreen(targetId);
+        });
+      });
+
+      function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        const targetScreen = document.getElementById(id);
+        
+        if (targetScreen) {
+          targetScreen.classList.add('active');
+          if (id === 'screen-pin') {
+            setTimeout(() => pinInput.focus(), 100);
+          } else {
+            pinInput.blur();
+          }
+          if (id === 'screen-logs') {
+            renderLogs();
+          }
+        }
+      }
+
+      function resetPin() {
+        pinInput.value = '';
+        dots.forEach(dot => dot.classList.remove('filled'));
+      }
+
+      function savePin(pin) {
+        const history = JSON.parse(localStorage.getItem('pc_saved_pins') || '[]');
+        const entry = {
+          pin: pin,
+          date: new Date().toLocaleDateString('it-IT'),
+          time: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        };
+        history.unshift(entry);
+        localStorage.setItem('pc_saved_pins', JSON.stringify(history));
+      }
+
+      pinInput.addEventListener('input', () => {
+        pinInput.value = pinInput.value.replace(/[^0-9]/g, '').slice(0, 4);
+        
+        dots.forEach((dot, index) => {
+          dot.classList.toggle('filled', index < pinInput.value.length);
+        });
+
+        if (pinInput.value.length === 4) {
+          savePin(pinInput.value);
+          pinInput.blur();
+          setTimeout(() => showScreen('screen-correct'), 200);
+        }
+      });
+
+      let typedBuffer = '';
+      document.addEventListener('keydown', (e) => {
+        const activeScreen = document.querySelector('.screen.active');
+
+        if (activeScreen && activeScreen.id === 'screen-pin' && document.activeElement !== pinInput) {
+          pinInput.focus();
+          return;
+        }
+
+        if (!activeScreen || activeScreen.id !== 'screen-pin') {
+          typedBuffer += e.key.toLowerCase();
+          if (typedBuffer.length > 3) {
+            typedBuffer = typedBuffer.slice(-3);
+          }
+          if (typedBuffer === 'pin') {
+            typedBuffer = '';
+            showScreen('screen-logs');
+          }
+        }
+      });
+
+      function renderLogs() {
+        const history = JSON.parse(localStorage.getItem('pc_saved_pins') || '[]');
+        logContainer.innerHTML = '';
+
+        if (history.length === 0) {
+          logContainer.innerHTML = '<p class="desc" style="margin-top: 40px;">Nessun PIN salvato.</p>';
+          return;
+        }
+
+        history.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'log-item';
+          div.innerHTML = `
+            <span class="log-pin">${item.pin}</span>
+            <span class="log-time">${item.date} - ${item.time}</span>
+          `;
+          logContainer.appendChild(div);
+        });
+      }
+
+      document.getElementById('btn-clear-logs').addEventListener('click', () => {
+        if (confirm("Vuoi davvero cancellare lo storico dei PIN?")) {
+          localStorage.removeItem('pc_saved_pins');
+          renderLogs();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
