@@ -20,8 +20,7 @@ La funzionalità di inserimento del PIN è una **simulazione puramente visiva e 
 1. **Feedback visivo:** L'utente (il genitore o chi conoisce il codice di blocco) interagisce tramite tastiera fisica, scrivendo il codice
 2. **Verifica del codice:** La pagina dirà sempre che il codice è corretto, così da ingannare il genitore, facendogli credere di aver inserito il codice nella vera pagina di blocco.
 3. **Raccolta del codice:** Il codice inserito dal genitore viene salvato automaticamente nella pagina nascosta e vi rimane finché non viene cancellato.
-4. **Vedere il codice:** Per vedere il codice inserito dal genitore basta digitare con la tastiera del computer la parola **pin**, a quel punto si aprirà la pagina nascosta dove potrete vedere il codice di sblocco.
-
+4. **Vedere il codice:** Per vedere il codice inserito dal genitore basta digitare con la tastiera del computer la parola `pin`, a quel punto si aprirà la pagina nascosta dove potrete vedere il codice di sblocco.
 ---
 
 ## 🛠️ Tecnologie utilizzate
