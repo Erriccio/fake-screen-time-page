@@ -1,6 +1,6 @@
-# 📱 Screen Time UI Mockup & Simulator
+# 📱 FAKE SCREEN TIME PAGE
 
-Una riproduzione web interattiva e reattiva della schermata di "Tempo di Utilizzo" (Screen Time). Questo progetto nasce a scopo didattico e dimostrativo per esplorare la creazione di interfacce utente moderne, animazioni CSS e gestione dello stato in JavaScript.
+Una riproduzione web interattiva della vera chermata di blocco per riuscire ad ottenere il codice di tempo di utilizzo.
 
 ---
 
